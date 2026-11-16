@@ -2,4 +2,6 @@
 tools
 artifact.html
 README.md
-*.md
+data
+__pycache__
+.venv

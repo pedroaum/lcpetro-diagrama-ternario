@@ -1,4 +1,9 @@
-# Site estático (HTML único) servido pelo nginx — deploy no Coolify do LC PETRO (porta 80)
-FROM nginx:alpine
-COPY index.html /usr/share/nginx/html/index.html
-EXPOSE 80
+# Diagrama Ternário LCPETRO — API FastAPI + página estática (deploy no Coolify, porta 8000)
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app ./app
+COPY index.html .
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
