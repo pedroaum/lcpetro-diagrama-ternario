@@ -18,7 +18,31 @@ Desenvolvida no LCPETRO (Laboratório de Engenharia e Ciências do Petróleo, UF
 
 ## Uso
 
-Abra `index.html` em um navegador moderno. A página também está publicada como artefato no claude.ai; a versão publicada usa o recurso de download do artefato, e fora dele os botões "Salvar …" ficam ocultos (use "Copiar SVG" ou o campo JSON).
+**Local, sem servidor:** abra `index.html` em um navegador moderno; os dados ficam no navegador.
+
+**Online (espelho com banco de dados):** a API em `app/main.py` (FastAPI) guarda projetos e diagramas em PostgreSQL e serve a mesma página. Quando a página é servida pela API, ela salva no servidor (indicador "● online" na caixa do projeto), atualiza a cada 15 s com alterações feitas em outros navegadores e continua guardando uma cópia local.
+
+```bash
+pip install -r requirements.txt
+uvicorn app.main:app --reload        # http://localhost:8000 (sem DATABASE_URL usa SQLite em data/app.db)
+```
+
+Rotas: `GET /api/workspace`, `POST /api/projects`, `PATCH|DELETE /api/projects/{id}`, `POST /api/projects/{id}/diagrams`, `GET|PUT|DELETE /api/diagrams/{id}`, `GET /api/health`; documentação em `/api/docs`.
+
+### Deploy no Coolify do LC PETRO
+
+1. Crie um recurso **PostgreSQL** no projeto do Coolify e copie a URL interna de conexão.
+2. Crie o app a partir deste repositório (Git Repository with GitHub App), branch `main`, build pack **Dockerfile**, **Port 8000**.
+3. Em variáveis de ambiente, defina `DATABASE_URL` com a URL do PostgreSQL (formatos `postgresql://…` e `postgres://…` são aceitos).
+4. Domínio sugerido: `ternario.lcpetro.io`, porta 8000. Deploy.
+
+Na primeira abertura com o banco vazio, a página envia para o servidor os dados que estiverem no navegador (ou o exemplo embutido).
+
+## Arquivos
+
+- `artifact.html` — fonte da página (publicada também como artefato no claude.ai, sem `<html>/<head>`).
+- `index.html` — página completa gerada por `tools/build-index.py` a partir de `artifact.html`; é a que o servidor e o Docker usam. Depois de editar `artifact.html`, rode `python3 tools/build-index.py`.
+- `app/main.py`, `requirements.txt`, `Dockerfile` — API e empacotamento.
 
 ## Estrutura dos dados (JSON)
 
